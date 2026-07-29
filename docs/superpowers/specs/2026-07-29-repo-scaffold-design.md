@@ -82,16 +82,18 @@ runtime/
     judge-ffi/
       Cargo.toml                # placeholder crate only — builds, does nothing yet
       src/lib.rs                 # doc comment marking the future cxx-based Ruckig/IK FFI bindings
-    runtime/
+    orchestrator/
       Cargo.toml
       src/main.rs                # binary: camera frame -> multi-sample generation (llama.cpp,
                                    # varied temperature) -> grammar::validate -> judge::check
                                    # (wired to MockJudge today) -> pair logging -> data/preference_pairs/*.jsonl
 ```
 
-- `runtime` (binary crate) depends on `grammar` and `judge`. It is wired
-  to `MockJudge` via its constructor today. Swapping in a real judge
-  later means: implement `PhysicalJudge` in a new crate (or in
+- `orchestrator` (the binary crate — named separately from the
+  `runtime/` directory to avoid a crate literally called `runtime`
+  nested inside `runtime/`) depends on `grammar` and `judge`. It is
+  wired to `MockJudge` via its constructor today. Swapping in a real
+  judge later means: implement `PhysicalJudge` in a new crate (or in
   `judge-ffi` once it has real bindings), change the one line where the
   binary constructs its judge instance. No other code changes.
 - `judge-ffi` exists now only as a visible placeholder for the future
@@ -170,9 +172,9 @@ becomes discoverable alongside the user's other PARA-style projects.
   always rejected (ties to the team doc's "parse-failure rate should be
   ~0%" evaluation goal).
 - `judge` crate: unit tests on `MockJudge`'s pass/fail behavior.
-- `runtime` binary crate: one integration test wiring a stubbed sampler
-  → `grammar` → `MockJudge` → logging, asserting a valid JSONL line
-  lands in a temp `data/preference_pairs/` directory.
+- `orchestrator` binary crate: one integration test wiring a stubbed
+  sampler → `grammar` → `MockJudge` → logging, asserting a valid JSONL
+  line lands in a temp `data/preference_pairs/` directory.
 - `training/tests/test_data.py`: loads a small fixture JSONL, asserts
   pairs parse correctly. No live training run in tests — that needs
   real weights and compute.
