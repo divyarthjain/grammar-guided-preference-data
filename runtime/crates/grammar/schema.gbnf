@@ -1,0 +1,3 @@
+# Placeholder — the real GBNF grammar constraining llama.cpp's token-level
+# decoding (team doc §5.1, phase 1 of the build plan) is not yet written.
+# See docs/grammar-schema.md for the JSON schema this will encode.
