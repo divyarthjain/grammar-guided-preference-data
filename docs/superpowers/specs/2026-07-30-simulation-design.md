@@ -76,9 +76,10 @@ concrete need it solves that direct scripting doesn't already cover.
 simulation/
   models/
     phantomx/            # vendored HumaRobotics/phantomx_description (BSD), urdf/ + meshes/
-  mujoco_judge/            # Python package (own pyproject.toml, uv-managed)
-    pyproject.toml
-    src/mujoco_judge/
+  pyproject.toml          # one Python package (uv-managed) for all Python simulation code
+  src/simulation/
+    __init__.py
+    mujoco_judge/
       __init__.py
       judge.py              # loads the PhantomX URDF into MuJoCo; given a candidate
                               # action, drives the simulated legs toward it and reports
@@ -88,16 +89,15 @@ simulation/
                                 # runtime/crates/orchestrator/src/sampler.rs — no real VLM yet
       loop.py                   # the continuous loop: sampler -> judge -> write to
                                   # data/preference_pairs/*.jsonl, with the MuJoCo viewer open
-    tests/
-      test_judge.py
-  replay/
-    pyproject.toml (or folded into mujoco_judge — decide at implementation time)
-    record_checkpoint.py       # runs the fixed test scenario(s) through a checkpoint +
-                                 # mujoco_judge, writes a replay file
-    schema.py                    # the replay-file format: scenario id, fixed camera,
-                                   # per-frame {leg joint angles, camera pose, predicted bbox}
-    tests/
-      test_record_checkpoint.py
+    replay/
+      __init__.py
+      record_checkpoint.py       # runs the fixed test scenario(s) through a checkpoint +
+                                   # mujoco_judge, writes a replay file
+      schema.py                    # the replay-file format: scenario id, fixed camera,
+                                     # per-frame {leg joint angles, camera pose, predicted bbox}
+  tests/
+    test_judge.py
+    test_record_checkpoint.py
   unity/
     # a Unity project: PhantomX URDF imported via URDF-Importer, a C# script
     # that reads a replay file and steps the rig through it frame-by-frame,
