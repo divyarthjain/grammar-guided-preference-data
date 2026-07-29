@@ -1,0 +1,19 @@
+# Rust
+runtime/target/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Data (real preference pairs are generated, not source; fixtures under
+# training/tests/fixtures/ are committed)
+data/preference_pairs/*.jsonl
+
+# OS
+.DS_Store
+
+# Editor
+.obsidian/
