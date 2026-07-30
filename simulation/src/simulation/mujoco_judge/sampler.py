@@ -8,7 +8,7 @@ def stubbed_candidates() -> list[dict]:
         {
             "object": "red block",
             "bbox": {"x": 300.0, "y": 220.0, "width": 40.0, "height": 40.0},
-            "confidence": 0.92,
+            "confidence": 0.9,
             "action_type": "grasp",
         },
         {
