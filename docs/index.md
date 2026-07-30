@@ -5,11 +5,12 @@ okf_version: "0.2"
 # grammar-guided-preference-data — docs
 
 An [OKF](https://okf.dev) v0.2 documentation bundle. Start here regardless
-of which part of the repo (`runtime/` or `training/`) you're about to
-touch.
+of which part of the repo (`runtime/`, `training/`, or `simulation/`)
+you're about to touch.
 
-* [Architecture](architecture.md) — the Rust/Python split, why, and the
-  open question on model choice.
+* [Architecture](architecture.md) — the Rust/Python split (plus
+  `simulation/`, a third MuJoCo-based component), why, and the open
+  question on model choice.
 * [Grammar schema](grammar-schema.md) — the JSON schema every model
   candidate must match.
 * [Physical judge](physical-judge.md) — what the judge is, `MockJudge`

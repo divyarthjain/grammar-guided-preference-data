@@ -884,12 +884,14 @@ def test_run_continuous_one_iteration_writes_well_formed_output(tmp_path, model,
         model, data, out_path, max_iterations=1, launch_viewer=False, frame_delay_seconds=0.0
     )
 
-    assert pairs_written in (0, 1)  # depends on real physics outcome of the two stub candidates
-    if pairs_written == 1:
-        loaded = load_pairs(out_path)
-        assert len(loaded) == 1
-        assert loaded[0].chosen["action_type"] in {"approach", "avoid", "grasp", "inspect", "none"}
-        assert loaded[0].rejected["action_type"] in {"approach", "avoid", "grasp", "inspect", "none"}
+    # Task 6 already established that stubbed_candidates()'s two entries
+    # deterministically judge as CHOSEN (center bbox) and REJECTED (corner
+    # bbox) — so one iteration over both must write exactly one pair.
+    assert pairs_written == 1
+    loaded = load_pairs(out_path)
+    assert len(loaded) == 1
+    assert loaded[0].chosen["object"] == "red block"
+    assert loaded[0].rejected["object"] == "table edge"
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -988,7 +990,7 @@ if __name__ == "__main__":
 uv run pytest tests/test_loop.py -v
 ```
 
-Expected: PASS.
+Expected: PASS. If `pairs_written` doesn't come out to `1`, that means Task 6's CHOSEN/REJECTED assumption for these two candidates didn't hold in practice here either — go back to Task 6 first (adjust `workspace_radius` or the stability thresholds there), since Task 9 relies on that same deterministic outcome.
 
 - [ ] **Step 5: Run the full test suite**
 
