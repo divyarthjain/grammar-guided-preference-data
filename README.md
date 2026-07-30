@@ -17,8 +17,11 @@ Start at [`docs/index.md`](docs/index.md) for the full picture.
   Raspberry Pi, aarch64).
 - `training/` — Python package: the offline DPO micro-anneal (dev
   machine, not the Pi).
-- `data/preference_pairs/` — shared JSONL, the only interface between
-  the two.
+- `simulation/` — Python package: a MuJoCo-based training-time physical
+  judge with a live viewer, feeding `data/preference_pairs/*.jsonl`
+  alongside the Rust runtime's judge.
+- `data/preference_pairs/` — shared JSONL, the interface between the
+  runtime and training/simulation components.
 - `docs/` — documentation bundle, start here.
 
 ## Quick start
@@ -26,4 +29,5 @@ Start at [`docs/index.md`](docs/index.md) for the full picture.
 ```
 cd runtime && cargo test --workspace
 cd training && uv run pytest
+cd simulation && uv run pytest
 ```

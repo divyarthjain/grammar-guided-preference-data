@@ -31,8 +31,19 @@ is redeployed, and the loop continues. See the team reference doc
   Runs on a dev machine, not the Pi. Python was kept here because Rust's
   ML training tooling isn't mature enough to bet a capstone timeline on
   reimplementing DPO from scratch.
-- The only interface between them is `data/preference_pairs/*.jsonl` —
-  neither side imports the other's code.
+- **`simulation/`** (Python, MuJoCo) — a third component, alongside the
+  above two: a training-time physical-feasibility judge built on a real
+  MuJoCo model of a stand-in robot (PhantomX; see
+  `simulation/models/phantomx/ATTRIBUTION.md`), with a live viewer for
+  inspecting candidate poses interactively. It feeds
+  `data/preference_pairs/*.jsonl` the same way the Rust runtime's judge
+  does, but exercises actual IK and physics settling rather than
+  `MockJudge`'s fake pass/fail — a way to develop and sanity-check
+  judge behavior before the real IK+Ruckig FFI bindings land in
+  `judge-ffi`.
+- The only interface between the Rust and Python sides is
+  `data/preference_pairs/*.jsonl` — none of `runtime/`, `training/`, or
+  `simulation/` imports another's code.
 
 # The judge as a pluggable interface
 
