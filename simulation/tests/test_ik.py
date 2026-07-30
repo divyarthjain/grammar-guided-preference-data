@@ -1,7 +1,7 @@
 import mujoco
 import numpy as np
 
-from simulation.mujoco_judge.constants import FOOT_BODY
+from simulation.mujoco_judge.constants import FOOT_BODY, LEG_JOINTS
 from simulation.mujoco_judge.ik import bbox_to_target, solve_leg_ik
 
 
@@ -45,3 +45,27 @@ def test_distant_target_does_not_converge(model, data):
 
     assert not converged
     assert error > 0.004
+
+
+def test_final_error_describes_returned_qpos_when_not_converged(model, data):
+    """Regression test: on the non-convergent (max_iters exhausted) exit path,
+    `final_error` must describe the *returned* `qpos_values` — not a stale
+    pre-update error from the iteration before the last `qpos` change."""
+    mujoco.mj_kinematics(model, data)
+    resting_foot_pos = data.xpos[model.body(FOOT_BODY).id].copy()
+    target = resting_foot_pos + np.array([5.0, 5.0, 5.0])
+
+    converged, qpos_values, error = solve_leg_ik(model, data, target)
+    assert not converged
+
+    # Recompute the actual foot position implied by the returned qpos_values
+    # and confirm `error` matches it exactly.
+    joint_ids = [model.joint(name).id for name in LEG_JOINTS]
+    qpos_adr = [model.jnt_qposadr[j] for j in joint_ids]
+    for adr, value in zip(qpos_adr, qpos_values):
+        data.qpos[adr] = value
+    mujoco.mj_kinematics(model, data)
+    actual_foot_pos = data.xpos[model.body(FOOT_BODY).id]
+    recomputed_error = np.linalg.norm(target - actual_foot_pos)
+
+    assert np.isclose(error, recomputed_error, atol=1e-9)

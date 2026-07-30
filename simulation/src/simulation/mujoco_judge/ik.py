@@ -64,6 +64,16 @@ def solve_leg_ik(
         dq = j_leg.T @ np.linalg.solve(jjt, error_vec)
         for i, adr in enumerate(qpos_adr):
             data.qpos[adr] += dq[i]
+    else:
+        # Loop exhausted max_iters without breaking: `error` above still
+        # reflects the position *before* the last dq update. Recompute it
+        # against the post-update qpos so final_error always describes the
+        # returned qpos_values, matching the convergent (break) path where
+        # no update follows the error check.
+        mujoco.mj_kinematics(model, data)
+        mujoco.mj_comPos(model, data)
+        foot_pos = data.xpos[body_id].copy()
+        error = float(np.linalg.norm(target - foot_pos))
 
     qpos_values = np.array([data.qpos[adr] for adr in qpos_adr])
     return error < tol, qpos_values, error
