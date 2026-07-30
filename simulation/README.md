@@ -37,4 +37,12 @@ Then run the viewer with `mjpython`, not `python`:
 uv run mjpython -m simulation.mujoco_judge
 ```
 
+**To stop: close the viewer window**, not Ctrl+C. Under mjpython on
+macOS the Python interpreter runs on a non-main OS thread while the
+Cocoa run loop owns the main thread, so a delivered SIGINT never gets
+processed and the loop won't be interrupted. Closing the window makes
+the loop stop on its own (checked via the viewer handle's
+`is_running()`), which also runs the normal cleanup path. `kill`/`SIGTERM`
+works too as a fallback, but skips that cleanup.
+
 See `scripts/fix_mjpython_dylib.sh` for what it does and why.

@@ -10,6 +10,12 @@ from simulation.mujoco_judge.loop import run_continuous
 # `mujoco.viewer.launch_passive` unconditionally raises otherwise. See
 # README.md ("macOS one-time step") for the one-time `mjpython` setup
 # fix this also depends on.
+#
+# To stop: close the viewer window (Ctrl+C does not work here -- under
+# mjpython on macOS, the Python interpreter runs on a non-main OS thread
+# while the Cocoa run loop owns the main thread, so a delivered SIGINT
+# never gets processed). Closing the window makes `run_continuous`'s
+# loop stop on its own via the viewer's `is_running()` check.
 if __name__ == "__main__":
     model = mujoco.MjModel.from_xml_path(str(SCENE_PATH))
     data = mujoco.MjData(model)
