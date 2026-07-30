@@ -46,3 +46,12 @@ the loop stop on its own (checked via the viewer handle's
 works too as a fallback, but skips that cleanup.
 
 See `scripts/fix_mjpython_dylib.sh` for what it does and why.
+
+## Known limitations
+
+`models/phantomx/scene.xml` has no actuators and no joint damping or
+friction. The stability check settles the pose as a passive, unpowered
+structure under gravity — it verifies the pose itself is mechanically
+stable, not that an actuated robot could hold it under real closed-loop
+control. Treat CHOSEN/REJECTED verdicts accordingly (see the note in
+`stability.py`'s module docstring).

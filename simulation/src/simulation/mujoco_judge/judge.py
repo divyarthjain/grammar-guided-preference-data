@@ -18,6 +18,11 @@ class MuJoCoJudge:
     §5.3): drives the simulated front-right leg toward a candidate's
     detected target and reports whether it's reachable, within joint
     limits, and doesn't topple or self-collide the robot.
+
+    Note: the stability leg of this check settles an unpowered model (no
+    actuators, no joint damping in `scene.xml`) — see the fidelity caveat
+    in `stability.py`'s module docstring before treating a CHOSEN verdict
+    as evidence an actuated robot could hold the pose.
     """
 
     def __init__(self, model, data):

@@ -1,5 +1,3 @@
-import json
-
 from training.data import load_pairs
 
 from simulation.mujoco_judge.pairs import make_pair, write_pair

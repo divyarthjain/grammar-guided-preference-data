@@ -1,3 +1,17 @@
+"""Post-IK stability check: settle the pose under gravity and see if it holds.
+
+Fidelity note: `models/phantomx/scene.xml` has no `<actuator>` elements and
+no joint damping/frictionloss. That means the settle step below
+(`mj_forward` + repeated `mj_step`) evaluates whether a fully passive,
+unpowered structure — positioned once by kinematic IK and then held by
+nothing — stays upright under gravity alone. It does not evaluate whether
+an actuated robot could actually hold that pose under its own closed-loop
+control. That's a real fidelity gap relative to the "physically-grounded
+stand-in for the real IK+Ruckig judge" framing in `judge.py`'s module
+docstring, worth keeping in mind when reading CHOSEN/REJECTED verdicts as
+a proxy for real-robot feasibility.
+"""
+
 import mujoco
 import numpy as np
 
@@ -32,6 +46,25 @@ def settle_and_check_stability(
 # slightly by design, even in a normal standing pose, and are not treated as
 # a self-collision. Bodies farther apart than this (a leg buckled into the
 # chassis, or into a different leg) are.
+#
+# Known interaction with ik.py's limitation: this hop-distance check is an
+# undirected graph metric — it clears any pair of bodies within
+# _MAX_BENIGN_HOPS of each other in the kinematic tree, not specifically
+# "this leg's own coxa/tibia at rest". solve_leg_ik only actually drives the
+# front-right leg (3 joints, but only 2 effective DOF — see ik.py), so in
+# principle a large enough swing of that leg's coxa could bring it into
+# genuine contact with a neighboring leg's mount, and if that neighboring
+# body happens to sit within _MAX_BENIGN_HOPS of the swinging body (a
+# same-leg-shaped pair by this undirected metric), this filter would wrongly
+# clear it as benign self-overlap instead of flagging a real collision.
+# In practice this is masked today because IK non-convergence (the `if not
+# converged: return REJECTED` check in judge.py, upstream of this function)
+# rejects most large-excursion targets before the collision check ever runs,
+# and `stubbed_candidates()` in sampler.py only ever produces small,
+# in-workspace targets. That's a property of the current stub sampler, not a
+# structural guarantee. Revisit this (tighten to a same-leg-only / directed
+# adjacency check, or add a regression test that exercises a large swing)
+# before a real (non-stub) sampler replaces stubbed_candidates().
 _MAX_BENIGN_HOPS = 2
 
 
